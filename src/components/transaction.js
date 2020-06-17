@@ -5,6 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from 'axios';
 import NumberFormat from 'react-number-format';
 import customToast from './customToast.js';
+import Loader from 'react-loader-spinner';
 
 
 const customStyles = {
@@ -52,6 +53,7 @@ function Transaction(){
     const { value:account, bind:bindaccount, reset:resetaccount } = useInput(wallets.id);
     const { value:transaction_type, bind:bindtransaction_type, reset:resettransaction_type } = useInput('income');
     const [startDate,setStartDate] = React.useState(new Date());
+    const [isLoading, setLoading] = useState(false);
   
 
 
@@ -62,10 +64,11 @@ function Transaction(){
       
   useEffect(() =>{
     setWallet(JSON.parse(localStorage.getItem('current_wallet')));
-    var wallets = JSON.parse(localStorage.getItem('current_wallet'))
-    wallets = wallets['id']
+    var wallets = JSON.parse(localStorage.getItem('current_wallet'));
+    wallets = wallets['id'];
+    setLoading(true);
     axios.get('https://inawoapi.herokuapp.com/api/v1/dashboard/home',{ headers: {"Authorization" : `Bearer ${user.token}`} }).then((response) => {
-      
+      setLoading(false);
       setAllWallet(response.data.wallets);
     },
     (error) => {
@@ -73,6 +76,7 @@ function Transaction(){
     });
     
     axios.get(`https://inawoapi.herokuapp.com/api/transaction/list/${wallets}`, { headers: {"Authorization" : `Bearer ${user.token}`} }).then((response) => {
+      setLoading(false); 
       setAllTransaction(response.data.transaction);
     },
     (error) => {
@@ -158,24 +162,42 @@ function Transaction(){
                           
                         </tr>
                       </thead>
-                      
+                      {isLoading ?
+                      <div className="container">
+                        <div className="text-center">
+                            <Loader
+                              type="Oval"
+                              color="#4e73df"
+                              height={30}
+                              width={30}
+                              //3 secs
+                          /> 
+                        </div>
+                      </div>
+                                :
                       <tbody>
+                      
+                
+                        {allTransaction.map((value, index) => {
+                          return (
+                            <tr key={index}>
+                              <td>{wallet.name}</td>
+                              <td><NumberFormat value={value.amount} displayType={'text'} thousandSeparator={true} prefix={'$'} /></td>
+                              <td>{value.payee}</td>
+                              <td>{value.transaction_type}</td>
+                              <td>{value.created_at}</td>
+                              <td>{value.updated_at}</td>
+                            </tr>
+                          )
+                        })}
+                          </tbody> 
+                      }
+
                         
-                      {allTransaction.map((value, index) => {
-                        return (
-                          <tr key={index}>
-                            <td>{wallet.name}</td>
-                            <td><NumberFormat value={value.amount} displayType={'text'} thousandSeparator={true} prefix={'$'} /></td>
-                            <td>{value.payee}</td>
-                            <td>{value.transaction_type}</td>
-                            <td>{value.created_at}</td>
-                            <td>{value.updated_at}</td>
-                          </tr>
-                        )
-                      })}
+                      
                         
                        
-                      </tbody>
+                      
                     </table>
                   </div>
                 </div>

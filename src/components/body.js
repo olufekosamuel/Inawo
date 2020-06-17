@@ -6,6 +6,7 @@ import Message from './message';
 import {Line, Doughnut} from 'react-chartjs-2';
 import NumberFormat from 'react-number-format';
 import customToast from './customToast.js';
+import Loader from 'react-loader-spinner';
 import '../assets/css/modal.css';
 
 
@@ -55,7 +56,8 @@ function Body(){
   const [wallet,setWallet] = React.useState([]);
   const [allWallet,setAllWallet] = React.useState([]);
   const [amountError, setAmountError] = useState(null)
-    const [nameError, setNameError] = useState(null)
+  const [nameError, setNameError] = useState(null)
+  const [isLoading, setLoading] = useState(false);
   const dater = new Date();
   const month = dater.getMonth();
   const monthNames = ["January", "February", "March", "April", "May", "June",
@@ -110,19 +112,14 @@ function Body(){
   }
  
 
-  function logout(){
-    localStorage.removeItem('current_wallet');
-    localStorage.removeItem('userData');
-    window.location.href = '/';
-  } 
-  
 
   useEffect(() =>{
     setMessage('');
     setIsMessage(false);
-    
+    setLoading(true);
 
   axios.get('https://inawoapi.herokuapp.com/api/v1/dashboard/home', { headers: {"Authorization" : `Bearer ${user.token}`} }).then((response) => {
+    setLoading(false);
       chart(response.data.year_income,response.data.year_expense)
       setData(response.data);
       setNoWallet(response.data.no_of_wallet);
@@ -222,7 +219,7 @@ function Body(){
     evt.preventDefault();
     
     
-  
+    
 
    
     closeModal()
@@ -264,7 +261,17 @@ function Body(){
                         <div className="row no-gutters align-items-center">
                             <div className="col mr-2">
                             <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">All Wallet Earnings ({monthNames[month]})</div>
-                            <div className="h5 mb-0 font-weight-bold text-gray-800"><NumberFormat value={data.current_month_earning} displayType={'text'} thousandSeparator={true} prefix={'$'} /></div>
+                            <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                {isLoading ?
+                                    <Loader
+                                        type="Oval"
+                                        color="#4e73df"
+                                        height={30}
+                                        width={30}
+                                        //3 secs
+                                    />                                 
+                                    :<NumberFormat value={data.current_month_earning} displayType={'text'} thousandSeparator={true} prefix={'$'} />}
+                              </div>
                             </div>
                             <div className="col-auto">
                             <i className="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -281,7 +288,16 @@ function Body(){
                         <div className="row no-gutters align-items-center">
                             <div className="col mr-2">
                             <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">All Wallet Earnings (Annual)</div>
-                            <div className="h5 mb-0 font-weight-bold text-gray-800"><NumberFormat value={data.annual_earnings} displayType={'text'} thousandSeparator={true} prefix={'$'} /></div>
+                            <div className="h5 mb-0 font-weight-bold text-gray-800">
+                              {isLoading ?
+                                    <Loader
+                                        type="Oval"
+                                        color="#4e73df"
+                                        height={30}
+                                        width={30}
+                                        //3 secs
+                                    /> :     
+                              <NumberFormat value={data.annual_earnings} displayType={'text'} thousandSeparator={true} prefix={'$'} />}</div>
                             </div>
                             <div className="col-auto">
                             <i className="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -299,7 +315,17 @@ function Body(){
                         <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">Current Wallet (choose)</div>
                         <div className="row no-gutters align-items-center">
                             <div className="col-auto">
-                              <div className="h5 mb-0 mr-3 font-weight-bold text-gray-800">{wallet.name? wallet.name : "None"}</div>
+                              <div className="h5 mb-0 mr-3 font-weight-bold text-gray-800">
+                              {isLoading ?
+                                    <Loader
+                                        type="Oval"
+                                        color="#4e73df"
+                                        height={30}
+                                        width={30}
+                                        //3 secs
+                                    />          :
+                                
+                                wallet.name? wallet.name : "None"} </div>
                             </div>
                            
                         </div>
@@ -319,7 +345,16 @@ function Body(){
                     <div className="row no-gutters align-items-center">
                         <div className="col mr-2">
                         <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">Wallets</div>
-                        <div className="h5 mb-0 font-weight-bold text-gray-800">{no_of_wallet}</div>
+                        <div className="h5 mb-0 font-weight-bold text-gray-800">
+                        {isLoading ?
+                                    <Loader
+                                        type="Oval"
+                                        color="#4e73df"
+                                        height={30}
+                                        width={30}
+                                        //3 secs
+                                    />          :
+                          no_of_wallet }</div>
                         </div>
                         <div className="col-auto">
                         <i className="fas fa-list fa-2x text-gray-300"></i>
