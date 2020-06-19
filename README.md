@@ -17,7 +17,6 @@ This a web application for a finance management system built with react and back
 ## Quick View
 <img src="./inawo.png" width="100%" alt="piggment">
 
-
 ## Available Scripts
 
 In the project directory, you can run:
